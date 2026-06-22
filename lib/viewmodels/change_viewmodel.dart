@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/payment_model.dart';
-import 'payment_viewmodel.dart';
 
 class ChangeViewmodel extends ChangeNotifier {
   int calculateTotalChange(List<PaymentModel> payments) {

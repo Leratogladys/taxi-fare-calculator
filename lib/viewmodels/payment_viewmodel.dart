@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/payment_model.dart';
-import 'fare_viewmodels.dart';
 
 class PaymentViewmodel extends ChangeNotifier {
   final List<PaymentModel> _payments = [];

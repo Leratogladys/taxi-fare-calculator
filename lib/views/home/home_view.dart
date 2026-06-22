@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/app_colors.dart';
+import 'package:taxi_fare_app/widgets/home/trip_status_card.dart';
+import '../../core/theme/app_colors.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -16,7 +17,7 @@ class HomeView extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            _card("Status Card"),
+            const TripStatusCard(),
             const SizedBox(height: 10),
             _card("Fare Calculation"),
             const SizedBox(height: 10),
@@ -34,7 +35,7 @@ class HomeView extends StatelessWidget {
         color: AppColors.card,
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Text(text, style: const TextStyle(color: AppColors.text)),
+      child: Text(text, style: const TextStyle(color: AppColors.accent)),
     );
   }
 }
