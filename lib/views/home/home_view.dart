@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:taxi_fare_app/widgets/home/trip_status_card.dart';
 import '../../core/theme/app_colors.dart';
+import '../../widgets/home/trip_status_card.dart';
+import '../../widgets/home/total_fare_card.dart';
+import '../../widgets/home/stage_card.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -12,16 +14,18 @@ class HomeView extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Taxi Calculator"),
         backgroundColor: AppColors.background,
+        elevation: 0,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(
+        child: const Column(
           children: [
-            const TripStatusCard(),
-            const SizedBox(height: 10),
-            _card("Fare Calculation"),
-            const SizedBox(height: 10),
-            _card("Record Payment"),
+            TripStatusCard(),
+            SizedBox(height: 12),
+            TotalFareCard(),
+            SizedBox(height: 12),
+            StageCard(),
+            SizedBox(height: 24),
           ],
         ),
       ),

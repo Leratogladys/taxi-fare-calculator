@@ -21,6 +21,7 @@ class PaymentModel {
       amount: amount ?? this.amount,
       passengers: passengers ?? this.passengers,
       change: change ?? this.change,
+      completed: completed ?? this.completed,
     );
   }
 }
