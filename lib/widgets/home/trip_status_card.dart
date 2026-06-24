@@ -1,11 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
+import '../../viewmodels/fare_viewmodels.dart';
+import '../../viewmodels/payment_viewmodel.dart';
 
 class TripStatusCard extends StatelessWidget {
   const TripStatusCard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final fareVm = context.watch<FareViewmodel>();
+    final paymentVm = context.watch<PaymentViewmodel>();
+
+    final totalFare = fareVm.fare.seats * fareVm.fare.farePerPerson;
+    final totalPaid = paymentVm.totalPaid;
+    final tripStarted = totalFare > 0;
+    final allPaid = tripStarted && totalPaid >= totalFare;
+
+    final statusText = !tripStarted
+        ? 'No trip started'
+        : allPaid
+            ? 'All payments received'
+            : 'Awaiting payments';
+
+    final amountText = tripStarted ? 'R$totalPaid / R$totalFare' : '—';
+
+    final iconData = !tripStarted
+        ? Icons.directions_car_outlined
+        : allPaid
+            ? Icons.check
+            : Icons.access_time_outlined;
+
+    final iconColor = !tripStarted
+        ? AppColors.secondary
+        : allPaid
+            ? AppColors.primary
+            : const Color(0xFFE07B39); // amber warning
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -14,44 +45,41 @@ class TripStatusCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
             width: 52,
             height: 52,
-            decoration: const BoxDecoration(
-              color: AppColors.primary,
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.check, color: AppColors.white),
+            child: Icon(iconData, color: iconColor),
           ),
-
           const SizedBox(width: 16),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "All payments received",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.accent,
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  child: Text(
+                    statusText,
+                    key: ValueKey(statusText),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.accent,
+                    ),
                   ),
                 ),
-
-                SizedBox(height: 4),
-
+                const SizedBox(height: 4),
                 Text(
-                  "R360 / R330",
-                  style: TextStyle(color: AppColors.secondary),
+                  amountText,
+                  style: const TextStyle(color: AppColors.secondary),
                 ),
               ],
             ),
           ),
-
-          const Icon(
-            Icons.chevron_right,
-            color: AppColors.secondary,
-          )
+          const Icon(Icons.chevron_right, color: AppColors.secondary),
         ],
       ),
     );
