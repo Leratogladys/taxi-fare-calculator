@@ -1,13 +1,12 @@
-import 'package:flutter/material.dart';
 import '../models/payment_model.dart';
 
-class ChangeViewmodel extends ChangeNotifier {
+class ChangeViewmodel {
   int calculateTotalChange(List<PaymentModel> payments) {
     return payments.fold(0, (sum, p) => sum + p.change);
   }
 
   int remainingChange(List<PaymentModel> payments) {
-    return payments.where((p) => !p.completed).fold(0, (sum, p) => p.change);
+    return payments.where((p) => !p.completed).fold(0, (sum, p) => sum + p.change);
   }
 
   List<PaymentModel> markAsGiven(List<PaymentModel> payments, int index) {

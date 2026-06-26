@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:taxi_fare_app/routes/app_router.dart';
 import 'package:provider/provider.dart';
-import 'package:taxi_fare_app/routes/app_router.dart';
 import 'package:taxi_fare_app/viewmodels/fare_viewmodels.dart';
 import 'package:taxi_fare_app/viewmodels/payment_viewmodel.dart';
 

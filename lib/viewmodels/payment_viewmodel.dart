@@ -10,6 +10,16 @@ class PaymentViewmodel extends ChangeNotifier {
 
   int get passengersPaid => _payments.fold(0, (sum, p) => sum + p.passengers);
 
+  // Return payments with change
+  List<MapEntry<int, PaymentModel>> get paymentsWithChange =>
+      _payments.asMap().entries.where((e) => e.value.change > 0).toList();
+
+  //Total change still owed
+
+  int get totalPendingChange => _payments
+      .where((p) => p.change > 0 && !p.completed)
+      .fold(0, (sum, p) => sum + p.change);
+
   void addPayment({
     required int amount,
     required int passengers,
@@ -25,6 +35,13 @@ class PaymentViewmodel extends ChangeNotifier {
         change: change > 0 ? change : 0,
       ),
     );
+
+    notifyListeners();
+  }
+
+  void markChangeAsGiven(int index) {
+    if (index < 0 || index >= _payments.length) return;
+    _payments[index] = _payments[index].copywith(completed: true);
 
     notifyListeners();
   }
