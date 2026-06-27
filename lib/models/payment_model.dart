@@ -1,3 +1,5 @@
+import 'package:hive/hive.dart';
+
 class PaymentModel {
   final int amount;
   final int passengers;
@@ -23,5 +25,29 @@ class PaymentModel {
       change: change ?? this.change,
       completed: completed ?? this.completed,
     );
+  }
+}
+
+class PaymentModelAdapter extends TypeAdapter<PaymentModel> {
+  @override
+  final int typeId = 1;
+
+  @override
+  PaymentModel read(BinaryReader reader) {
+    return PaymentModel(
+      amount: reader.readInt(),
+      passengers: reader.readInt(),
+      change: reader.readInt(),
+      completed: reader.readBool(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, PaymentModel obj) {
+    writer.writeInt(obj.amount);
+    writer.writeInt(obj.passengers);
+    writer.writeInt(obj.change);
+    writer.writeBool(obj.completed);
+
   }
 }

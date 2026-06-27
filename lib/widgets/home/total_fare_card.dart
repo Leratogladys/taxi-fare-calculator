@@ -13,6 +13,22 @@ class TotalFareCard extends StatefulWidget {
 class _TotalFareCardState extends State<TotalFareCard> {
   final _seatsController = TextEditingController();
   final _fareController = TextEditingController();
+  bool _initialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      final vm = context.read<FareViewmodel>();
+      if (vm.fare.seats > 0) {
+        _seatsController.text = vm.fare.seats.toString();
+      }
+      if (vm.fare.farePerPerson > 0) {
+        _fareController.text = vm.fare.farePerPerson.toString();
+      }
+      _initialized = true;
+    }
+  }
 
   @override
   void dispose() {

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:taxi_fare_app/routes/app_router.dart';
 import 'package:provider/provider.dart';
+import 'package:taxi_fare_app/core/services/hive_service.dart';
+import 'package:taxi_fare_app/routes/app_router.dart';
 import 'package:taxi_fare_app/viewmodels/fare_viewmodels.dart';
 import 'package:taxi_fare_app/viewmodels/payment_viewmodel.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await HiveService.init();
   runApp(const MyApp());
 }
 
@@ -18,13 +21,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => FareViewmodel()),
         ChangeNotifierProvider(create: (_) => PaymentViewmodel()),
       ],
-       child: MaterialApp(
-        title: "Taxi Maths Calculator",
+      child: MaterialApp(
+        title: 'Taxi Maths Calculator',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData( scaffoldBackgroundColor: const Color(0xFF2D2B55)),
+        theme: ThemeData(scaffoldBackgroundColor: const Color(0xFF2D2B55)),
         onGenerateRoute: AppRouter.generateRoute,
         initialRoute: AppRoutes.home,
-       ),
+      ),
     );
   }
 }
