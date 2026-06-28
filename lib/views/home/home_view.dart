@@ -90,14 +90,14 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  Widget _card(String text) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Text(text, style: const TextStyle(color: AppColors.accent)),
-    );
-  }
+ // Widget _card(String text) {
+   // return Container(
+     // padding: const EdgeInsets.all(16),
+     // decoration: BoxDecoration(
+       // color: AppColors.card,
+       // borderRadius: BorderRadius.circular(10),
+      //),
+     // child: Text(text, style: const TextStyle(color: AppColors.accent)),
+   // );
+ // }
 }
