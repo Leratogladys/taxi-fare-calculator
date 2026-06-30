@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import '../models/fare_model.dart';
+import '../models/route_model.dart';
 import '../core/services/hive_service.dart';
 
 class FareViewmodel extends ChangeNotifier {
-  FareModel _fare = FareModel(seats: 0, farePerPerson: 0);
-  int _tripId = 0;
+  FareModel   _fare          = FareModel(seats: 0, farePerPerson: 0);
+  int         _tripId        = 0;
+  RouteModel? _selectedRoute;
 
-  FareModel get fare => _fare;
-  int get tripId => _tripId;
+  FareModel   get fare          => _fare;
+  int         get tripId        => _tripId;
+  RouteModel? get selectedRoute => _selectedRoute;
 
   FareViewmodel() {
     _loadFromHive();
@@ -18,37 +21,48 @@ class FareViewmodel extends ChangeNotifier {
     if (box.isNotEmpty) _fare = box.getAt(0)!;
   }
 
-  void _persist() {
+  Future<void> _persist() async {
     final box = HiveService.activeFareBox;
     if (box.isEmpty) {
-      box.add(_fare);
+      await box.add(_fare);
     } else {
-      box.putAt(0, _fare);
+      await box.putAt(0, _fare);
     }
   }
 
-  void updateSeats(int seats) {
+  Future<void> updateSeats(int seats) async {
     _fare = _fare.copywith(seats: seats);
-    _persist();
     notifyListeners();
+    await _persist();
   }
 
-  void updateFare(int farePerPerson) {
+  Future<void> updateFare(int farePerPerson) async {
+    _selectedRoute = null; // manual entry clears route label
     _fare = _fare.copywith(farePerPerson: farePerPerson);
-    _persist();
     notifyListeners();
+    await _persist();
   }
 
-  void setFare(int seats, int farePerPerson) {
+  // Called by RouteLibrarySheet when a route is tapped
+  Future<void> applyRoute(RouteModel route) async {
+    _selectedRoute = route;
+    _fare = _fare.copywith(farePerPerson: route.fare);
+    notifyListeners();
+    await _persist();
+  }
+
+  Future<void> setFare(int seats, int farePerPerson) async {
+    _selectedRoute = null;
     _fare = _fare.copywith(seats: seats, farePerPerson: farePerPerson);
-    _persist();
     notifyListeners();
+    await _persist();
   }
 
-  void reset() {
-    _fare = FareModel(seats: 0, farePerPerson: 0);
+  Future<void> reset() async {
+    _fare          = FareModel(seats: 0, farePerPerson: 0);
+    _selectedRoute = null;
     _tripId++;
-    HiveService.activeFareBox.clear();
     notifyListeners();
+    await HiveService.activeFareBox.clear();
   }
 }

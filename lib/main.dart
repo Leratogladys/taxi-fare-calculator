@@ -4,6 +4,7 @@ import 'package:taxi_fare_app/core/services/hive_service.dart';
 import 'package:taxi_fare_app/routes/app_router.dart';
 import 'package:taxi_fare_app/viewmodels/fare_viewmodels.dart';
 import 'package:taxi_fare_app/viewmodels/payment_viewmodel.dart';
+import 'package:taxi_fare_app/viewmodels/route_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => FareViewmodel()),
         ChangeNotifierProvider(create: (_) => PaymentViewmodel()),
+        ChangeNotifierProvider(create: (_) => RouteViewmodel()),
       ],
       child: MaterialApp(
         title: 'Taxi Maths Calculator',

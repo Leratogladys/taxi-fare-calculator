@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../viewmodels/fare_viewmodels.dart';
+import '../../routes/route_library_sheet.dart';
 
 class TotalFareCard extends StatefulWidget {
   const TotalFareCard({super.key});
@@ -12,26 +13,47 @@ class TotalFareCard extends StatefulWidget {
 
 class _TotalFareCardState extends State<TotalFareCard> {
   final _seatsController = TextEditingController();
-  final _fareController = TextEditingController();
+  final _fareController  = TextEditingController();
+  late final FareViewmodel _fareVm;
   bool _initialized = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_initialized) {
-      final vm = context.read<FareViewmodel>();
-      if (vm.fare.seats > 0) {
-        _seatsController.text = vm.fare.seats.toString();
+      _fareVm = context.read<FareViewmodel>();
+      // Restore persisted values on restart
+      if (_fareVm.fare.seats > 0) {
+        _seatsController.text = _fareVm.fare.seats.toString();
       }
-      if (vm.fare.farePerPerson > 0) {
-        _fareController.text = vm.fare.farePerPerson.toString();
+      if (_fareVm.fare.farePerPerson > 0) {
+        _fareController.text = _fareVm.fare.farePerPerson.toString();
       }
+      // Listen for external changes (route selection)
+      _fareVm.addListener(_syncControllers);
       _initialized = true;
+    }
+  }
+
+  // Fires when a route is applied from RouteLibrarySheet
+  void _syncControllers() {
+    final newFare  = _fareVm.fare.farePerPerson;
+    final newSeats = _fareVm.fare.seats;
+    if (newFare == 0) {
+      _fareController.clear();
+    } else if (_fareController.text != newFare.toString()) {
+      _fareController.text = newFare.toString();
+    }
+    if (newSeats == 0) {
+      _seatsController.clear();
+    } else if (_seatsController.text != newSeats.toString()) {
+      _seatsController.text = newSeats.toString();
     }
   }
 
   @override
   void dispose() {
+    _fareVm.removeListener(_syncControllers);
     _seatsController.dispose();
     _fareController.dispose();
     super.dispose();
@@ -39,7 +61,7 @@ class _TotalFareCardState extends State<TotalFareCard> {
 
   @override
   Widget build(BuildContext context) {
-    final vm = context.watch<FareViewmodel>();
+    final vm        = context.watch<FareViewmodel>();
     final totalFare = vm.fare.seats * vm.fare.farePerPerson;
 
     return Container(
@@ -55,20 +77,51 @@ class _TotalFareCardState extends State<TotalFareCard> {
           ),
         ],
       ),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "FARE CALCULATION",
-            style: TextStyle(
-              color: AppColors.secondary,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.2,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'FARE CALCULATION',
+                style: TextStyle(
+                  color: AppColors.secondary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              GestureDetector(
+                onTap: () => RouteLibrarySheet.show(context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.route_outlined,
+                          size: 13, color: AppColors.accent),
+                      const SizedBox(width: 4),
+                      Text(
+                        vm.selectedRoute != null
+                            ? vm.selectedRoute!.displayName
+                            : 'Routes',
+                        style: const TextStyle(
+                          color: AppColors.accent,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-
           const SizedBox(height: 16),
           Row(
             children: [
@@ -78,11 +131,12 @@ class _TotalFareCardState extends State<TotalFareCard> {
                   controller: _seatsController,
                   onChanged: (v) {
                     final n = int.tryParse(v);
-                    if (n != null) context.read<FareViewmodel>().updateSeats(n);
+                    if (n != null) {
+                      context.read<FareViewmodel>().updateSeats(n);
+                    }
                   },
                 ),
               ),
-
               const SizedBox(width: 12),
               Expanded(
                 child: _InputField(
@@ -90,17 +144,19 @@ class _TotalFareCardState extends State<TotalFareCard> {
                   controller: _fareController,
                   onChanged: (v) {
                     final n = int.tryParse(v);
-                    if (n != null) context.read<FareViewmodel>().updateFare(n);
+                    if (n != null) {
+                      context.read<FareViewmodel>().updateFare(n);
+                    }
                   },
                 ),
               ),
             ],
           ),
-
           const SizedBox(height: 16),
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            padding:
+                const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
             decoration: BoxDecoration(
               color: AppColors.accent,
               borderRadius: BorderRadius.circular(12),
@@ -154,7 +210,6 @@ class _InputField extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-
         const SizedBox(height: 6),
         TextField(
           controller: controller,
@@ -168,10 +223,8 @@ class _InputField extends StatelessWidget {
           decoration: InputDecoration(
             filled: true,
             fillColor: AppColors.background,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 12,
-            ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide.none,
